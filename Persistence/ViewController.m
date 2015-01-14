@@ -27,4 +27,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)toggleSpinner:(id)sender {
+}
+
+- (IBAction)controlValueChanged:(id)sender {
+}
 @end
