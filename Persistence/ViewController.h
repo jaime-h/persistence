@@ -11,7 +11,10 @@
 @interface ViewController : UIViewController <UITextViewDelegate>
 @property (strong, nonatomic) IBOutlet UISegmentedControl *segments;
 @property (strong, nonatomic) IBOutlet UIProgressView *progressBar;
-@property (strong, nonatomic) IBOutlet UISwitch *cSwitch;
+
+@property (strong, nonatomic) IBOutlet UISwitch *nSwitch;
+
+
 @property (strong, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 @property (strong, nonatomic) IBOutlet UITextField *textField;
 @property (strong, nonatomic) IBOutlet UIButton *spinningButton;
@@ -26,6 +29,9 @@
 
 - (IBAction)toggleSpinner:(id)sender;
 - (IBAction)controlsValueDidChange:(id)sender;
+
+- (IBAction)didTouchSwitch:(id)sender;
+
 
 @end
 

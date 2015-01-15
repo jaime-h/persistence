@@ -56,7 +56,7 @@
         else
             [self.spinner stopAnimating];
         
-        self.cSwitch.enabled = [[self.controlState objectForKey:@"SwitchEnabledState"] boolValue];
+        // self.nSwitch.enabled = [[self.controlState objectForKey:@"SwitchEnabledState"] boolValue];
         
         self.progressBar.progress = [[self.controlState objectForKey:@"ProgressBarProgress"] floatValue];
         
@@ -117,9 +117,9 @@
         NSInteger selectedSegment = ((UISegmentedControl *)sender).selectedSegmentIndex;
         [[NSUserDefaults standardUserDefaults]setInteger:selectedSegment forKey:@"SelectedSegmentIndex"];
     }
-    else if (sender == self.cSwitch)
+    else if (sender == self.nSwitch)
     {
-        [self.controlState setValue:[NSNumber numberWithBool:self.cSwitch.enabled] forKey:@"SwitchEnabledState"];
+        [self.controlState setValue:[NSNumber numberWithBool:self.nSwitch.enabled] forKey:@"SwitchEnabledState"];
     }
     else if (sender == self.textField)
     {
@@ -155,6 +155,18 @@
     [archiver finishEncoding];
     NSString *dataPath = [documentsDirectoryPath stringByAppendingPathComponent:@"archivedObjects"];
     [data writeToFile:dataPath atomically:YES];
+
+}
+
+- (IBAction)switch:(UISwitch *)sender {
+}
+
+- (IBAction)didTouchSwitch:(id)sender
+{
+    if (sender == self.nSwitch)
+    {
+        [self.controlState setValue:[NSNumber numberWithBool:self.nSwitch.enabled] forKey:@"SwitchEnabledState"];
+    }
 
 }
 
