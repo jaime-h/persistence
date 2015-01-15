@@ -93,13 +93,13 @@
     if (self.spinner.isAnimating)
     {
         [self.spinner stopAnimating];
-        ((UIButton *) sender).titleLabel.text = @"Start Spinning";
+        ((UIButton *)sender).titleLabel.text = @"Start Spinning";
         [self.controlState setValue:[NSNumber numberWithBool:NO]forKey:@"SpinnerAnimatingState"];
     }
     else
     {
         [self.spinner startAnimating];
-        ((UIButton *) sender).titleLabel.text = @"Stop Spinning";
+        ((UIButton *)sender).titleLabel.text = @"Stop Spinning";
         [self.controlState setValue:[NSNumber numberWithBool:YES]forKey:@"SpinnerAnimatingState"];
 
     }
