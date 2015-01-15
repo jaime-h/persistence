@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <UITextViewDelegate>
 @property (strong, nonatomic) IBOutlet UISegmentedControl *segments;
 @property (strong, nonatomic) IBOutlet UIProgressView *progressBar;
 @property (strong, nonatomic) IBOutlet UISwitch *cSwitch;
@@ -18,10 +18,14 @@
 @property (strong, nonatomic) IBOutlet UISlider *slider1;
 @property (strong, nonatomic) IBOutlet UISlider *slider2;
 @property (strong, nonatomic) IBOutlet UISlider *slider3;
+@property (strong, nonatomic) IBOutlet UITextView *textBox;
+
+@property (nonatomic, strong) NSMutableDictionary *controlState;
+@property (nonatomic, strong) NSMutableDictionary *sliderValues;
+
 
 - (IBAction)toggleSpinner:(id)sender;
-- (IBAction)controlValueChanged:(id)sender;
-
+- (IBAction)controlsValueDidChange:(id)sender;
 
 @end
 

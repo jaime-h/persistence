@@ -5,20 +5,18 @@
 //  Created by Jaime Hernandez on 1/14/15.
 //  Copyright (c) 2015 Jaime Hernandez. All rights reserved.
 //
-//  From the follwoing tutorial on persistence
+//  From the following tutorial on persistence
 //  http://www.binpress.com/tutorial/learn-objectivec-building-an-app-part-10-basic-data-persistence/103
 //
 
 #import "ViewController.h"
 
 @interface ViewController ()
-{
-    id anInt;
-    id aFloat;
-    id obj1;
-}
-@property (nonatomic, strong) NSMutableDictionary *controlState;
-@property (nonatomic, strong) NSMutableDictionary *sliderValues;
+//{
+//    id anInt;
+//    id aFloat;
+//    id obj1;
+//}
 
 
 
@@ -26,31 +24,69 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad {
+#pragma mark - ViewController Life Cycle
+
+- (void)viewDidLoad
+{
     [super viewDidLoad];
+    
+        self.controlState = [NSMutableDictionary dictionary];
+        self.sliderValues = [NSMutableDictionary dictionary];
 }
 
-- (void)didReceiveMemoryWarning {
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // Load segmented control selection
+    NSInteger selectedSegmentIndex = [[NSUserDefaults standardUserDefaults] integerForKey:@"SelectedSegmentIndex"];
+    self.segments.selectedSegmentIndex = selectedSegmentIndex;
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
+    
+    // Load data from plist
+    if ([[self.controlState allKeys] count] == 0)
+    {
+        NSString *filePath = [documentsDirectoryPath stringByAppendingPathComponent:@"componentState.plist"];
+        self.controlState = [NSMutableDictionary dictionaryWithContentsOfFile:filePath];
+        
+        if ([[self.controlState objectForKey:@"SpinnerAnimatingState"] boolValue])
+            [self.spinner startAnimating];
+        else
+            [self.spinner stopAnimating];
+        
+        self.cSwitch.enabled = [[self.controlState objectForKey:@"SwitchEnabledState"] boolValue];
+        
+        self.progressBar.progress = [[self.controlState objectForKey:@"ProgressBarProgress"] floatValue];
+        
+        self.textField.text = [self.controlState objectForKey:@"TextFieldContents"];
+    }
+    
+    // Decode objects
+    if ([[self.sliderValues allKeys] count] == 0)
+    {
+        NSMutableData *data = [[NSMutableData alloc] initWithContentsOfFile:[documentsDirectoryPath stringByAppendingPathComponent:@"archivedObjects"]];
+        NSKeyedUnarchiver *decoder = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+        self.sliderValues = [decoder decodeObjectForKey:@"SliderValues"];
+        self.slider1.value = [[self.sliderValues objectForKey:@"Slider1Key"] floatValue];
+        self.slider2.value = [[self.sliderValues objectForKey:@"Slider2Key"] floatValue];
+        self.slider3.value = [[self.sliderValues objectForKey:@"Slider3Key"] floatValue];
+    }
+    
+    // Read text file
+    NSString *textViewData = [NSString stringWithContentsOfFile:[documentsDirectoryPath stringByAppendingPathComponent:@"TextViewContents.txt"] encoding:NSUTF8StringEncoding error:nil];
+    self.textBox.text = textViewData;
+}
+
+
+- (void)didReceiveMemoryWarning
+{
     [super didReceiveMemoryWarning];
 }
 
--(id)initWithCoder:(NSCoder *)aDecoder
-{
-    if (!(self = [super init]))
-        return nil;
-    obj1   = [aDecoder decodeObjectForKey:@"obj1Key"];
-    anInt  = [aDecoder decodeObjectForKey:@"IntValueKey"];
-    aFloat = [aDecoder decodeObjectForKey:@"FloatValueKey"];
-}
 
-
--(void)encodeWithCoder:(NSCoder *)encoder
-{
-    [encoder encodeObject:obj1  forKey:@"obj1Key"];
-    [encoder encodeInt:anInt    forKey:@"IntValueKey"];
-    [encoder encodeFloat:aFloat forKey:@"FloatValueKey"];
-}
-
+#pragma mark - IBAction Methods
 
 - (IBAction)toggleSpinner:(id)sender
 {
@@ -69,8 +105,13 @@
     }
 }
 
-- (IBAction)controlValueChanged:(id)sender
+- (IBAction)controlsValueDidChange:(id)sender
 {
+    if (!self.controlState)
+        self.controlState = [NSMutableDictionary dictionary];
+    if (!self.sliderValues)
+        self.sliderValues = [NSMutableDictionary dictionary];
+    
     if (sender == self.segments)
     {
         NSInteger selectedSegment = ((UISegmentedControl *)sender).selectedSegmentIndex;
@@ -87,6 +128,10 @@
     else if (sender == self.slider1)
     {
         [self.sliderValues setValue:[NSNumber numberWithFloat:self.slider1.value] forKey:@"Slider1Key"];
+        
+        // Update progress bar with slider
+        [self.progressBar setProgress:self.slider1.value];
+        [self.controlState setValue:[NSNumber numberWithFloat:self.progressBar.progress] forKey:@"ProgressBarProgress"];
     }
     else if (sender == self.slider2)
     {
@@ -110,6 +155,18 @@
     [archiver finishEncoding];
     NSString *dataPath = [documentsDirectoryPath stringByAppendingPathComponent:@"archivedObjects"];
     [data writeToFile:dataPath atomically:YES];
-    
+
 }
+
+#pragma mark - TextView Delegate
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    NSString *textViewContents = textView.text;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
+    NSString *filePath = [documentsDirectoryPath stringByAppendingPathComponent:@"TextViewContents.txt"];
+    [textViewContents writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
 @end
